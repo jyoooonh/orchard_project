@@ -35,11 +35,6 @@
                                                     <input type="date" class="form-control" id="id_start_date" name="start_date"
                                                            value="{{ form.start_date.value|default_if_none:'' }}">
                                                 </div>
-                                                <div class="col-md-6">
-                                                    <label for="id_end_date" class="form-label">마지막일</label>
-                                                    <input type="date" class="form-control" id="id_end_date" name="end_date"
-                                                           value="{{ form.end_date.value|default_if_none:'' }}">
-                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -97,99 +92,54 @@
                                         <p class="card-title" style="margin: 0; font-size:46px;">
                                             <strong>{{ student.student }}</strong></p>
                                     </div>
-                                    <div class="card-header">
-                                        <h4 class="card-text">{{ report.week_name }}</h4>
-                                    </div>
-                                    <div class="card-body">
-                                        <p class="card-text" style="font-size:14px">{{ report.start_date }} ~ </p>
+{#                                    <div class="card-header">#}
+{#                                        <h4 class="card-text">{{ report.week_name }}</h4>#}
+{#                                    </div>#}
+{#                                    <div class="card-body">#}
+{#                                        <p class="card-text" style="font-size:14px">{{ report.start_date }} ~ </p>#}
 {#                                        <p class="card-text" style="font-size:14px">{{ report.end_date }}</p>#}
+{#                                    </div>#}
+                                </div>
+                                <div class="card mt-3">
+                                    <div class="card-header bg-primary-subtle"
+                                         style="display: flex; align-items: center;">
+                                        <p class="card-title" style="margin: 0; font-size:20px">
+                                            <strong>총 질문 및 상담</strong></p>
                                     </div>
-                                    <ul class="list-group list-group-flush">
-{#                                        국어 #}
-                                        <li class="list-group-item bg-light"
-                                            style="white-space: nowrap;"></li>
-                                        <li class="list-group-item bg-warning-subtle"
-                                            style="white-space: nowrap; font-size:20px">
-                                            <div class="row">
-                                                <div class="col-md-6" style="text-align: center">
-                                                    <strong>국어 질문</strong>
-                                                </div>
-                                                <div class="col-md-6" style="text-align: center">{{ report.question_counts.korean }}회</div>
-                                            </div>
-                                        </li>
-                                        <li class="list-group-item bg-warning-subtle"
-                                            style="white-space: nowrap; font-size:20px">
-                                            <div class="row">
-                                                <div class="col-md-6" style="text-align: center">
-                                                    <strong>국어 상담</strong>
-                                                </div>
-                                                <div class="col-md-6" style="text-align: center">{{ report.consulting_counts.korean }}회</div>
-                                            </div>
-                                        </li>
-{#                                        수학 #}
-                                        <li class="list-group-item bg-light"
-                                            style="white-space: nowrap;"></li>
-                                        <li class="list-group-item bg-success-subtle"
-                                            style="white-space: nowrap; font-size:20px">
-                                            <div class="row">
-                                                <div class="col-md-6" style="text-align: center">
-                                                    <strong>수학 질문</strong>
-                                                </div>
-                                                <div class="col-md-6" style="text-align: center">{{ report.question_counts.math }}회</div>
-                                            </div>
-                                        </li>
-                                        <li class="list-group-item bg-success-subtle"
-                                            style="white-space: nowrap; font-size:20px">
-                                            <div class="row">
-                                                <div class="col-md-6" style="text-align: center">
-                                                    <strong>수학 상담</strong>
-                                                </div>
-                                                <div class="col-md-6" style="text-align: center">{{ report.consulting_counts.math }}회</div>
-                                            </div>
-                                        </li>
-{#                                        영어 #}
-                                        <li class="list-group-item bg-light"
-                                            style="white-space: nowrap;"></li>
-                                        <li class="list-group-item bg-danger-subtle"
-                                            style="white-space: nowrap; font-size:20px">
-                                            <div class="row">
-                                                <div class="col-md-6" style="text-align: center">
-                                                    <strong>영어 질문</strong>
-                                                </div>
-                                                <div class="col-md-6" style="text-align: center">{{ report.question_counts.english }}회</div>
-                                            </div>
-                                        </li>
-                                        <li class="list-group-item bg-danger-subtle"
-                                            style="white-space: nowrap; font-size:20px">
-                                            <div class="row">
-                                                <div class="col-md-6" style="text-align: center">
-                                                    <strong>영어 상담</strong>
-                                                </div>
-                                                <div class="col-md-6" style="text-align: center">{{ report.consulting_counts.english }}회</div>
-                                            </div>
-                                        </li>
-{#                                        탐구 #}
-                                        <li class="list-group-item bg-light"
-                                            style="white-space: nowrap;"></li>
-                                        <li class="list-group-item bg-primary-subtle"
-                                            style="white-space: nowrap; font-size:20px">
-                                            <div class="row">
-                                                <div class="col-md-6" style="text-align: center">
-                                                    <strong>탐구 질문</strong>
-                                                </div>
-                                                <div class="col-md-6" style="text-align: center">{{ report.question_counts.research }}회</div>
-                                            </div>
-                                        </li>
-                                        <li class="list-group-item bg-primary-subtle"
-                                            style="white-space: nowrap; font-size:20px">
-                                            <div class="row">
-                                                <div class="col-md-6" style="text-align: center">
-                                                    <strong>탐구 상담</strong>
-                                                </div>
-                                                <div class="col-md-6" style="text-align: center">{{ report.consulting_counts.research }}회</div>
-                                            </div>
-                                        </li>
-                                    </ul>
+                                    <div class="card-body"
+                                         style="display: flex; align-items: center; text-align: center">
+                                        {{ report.total_question_data }}회
+                                    </div>
+                                </div>
+                                <div class="card mt-3" style="height: 12rem">
+                                    <div class="card-header bg-warning-subtle"
+                                         style="display: flex; align-items: center;">
+                                        <p class="card-title" style="margin: 0; font-size:20px">
+                                            <strong>국어 주간 테스트</strong></p>
+                                    </div>
+                                    <div class="card-body"
+                                         style="display: flex; align-items: center; text-align: center;">"
+                                        1차 시험 결과
+                                    </div>
+                                    <div class="card-body"
+                                         style="display: flex; align-items: center; text-align: center;">
+                                        2차 시험 결과
+                                    </div>
+                                </div>
+                                <div class="card mt-3" style="height: 12rem">
+                                    <div class="card-header bg-success-subtle"
+                                         style="display: flex; align-items: center;">
+                                        <p class="card-title" style="margin: 0; font-size:20px">
+                                            <strong>수학 주간 테스트</strong></p>
+                                    </div>
+                                    <div class="card-body"
+                                         style="display: flex; align-items: center; text-align: center;">"
+                                        1차 시험 결과
+                                    </div>
+                                    <div class="card-body"
+                                         style="display: flex; align-items: center; text-align: center;">
+                                        2차 시험 결과
+                                    </div>
                                 </div>
                             </div>
                             <div>
@@ -203,29 +153,11 @@
                                      alt="이미지 저장" style="cursor:pointer; height:30px; width:30px; opacity:0.05; margin-top: 100px"/>
                             </div>
                         </div>
-                        <div class="col-md-4">
-                            <div class="card border border-success" style="height:640px">
-                                주간 테스트 및 학습 상담
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div id="demo-desktop-month-view"></div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div id="demo-desktop-month-view"></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="card border border-success" style="height:640px">
+                        <div class="col-md-10">
+                            <div class="card border border-success" style="height:624px">
                                 영어 단어 테스트
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div id="demo-desktop-month-view"></div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div id="demo-desktop-month-view"></div>
-                                    </div>
+                                <div class="card">
+
                                 </div>
                             </div>
                         </div>

@@ -29,6 +29,9 @@ def question_report(request, student_id):
 
     question_data = Reserve.objects.filter(student_name__username=student.username, date__range=[start_date, end_date])
 
+    total_question_data = question_data.count()
+
+    # 각 과목 별 질문 및 상담
     subject_question_counts = {
         'korean': 0,
         'math': 0,
@@ -58,9 +61,10 @@ def question_report(request, student_id):
         'start_date': start_date,
         'end_date': end_date,
         'question_counts': subject_question_counts,
-        'consulting_counts': subject_consulting_counts
+        'consulting_counts': subject_consulting_counts,
+        'total_question_data': total_question_data
     }
-    print(subject_question_counts['korean'])
+    print(report['total_question_data'])
 
     context = {'student': student, 'report': report}
     return render(request, 'report/question/question_report.html', context)
