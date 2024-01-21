@@ -29,63 +29,63 @@ def index(request):
 
     return render(request, 'manager/word/word_main.html', context)
 
-def word_detail(request):
-    data = Student_Study_Data.objects.filter(user__id=student_id).order_by('-id')
+def word_detail(request, student_id):
+    data = WordTest.objects.filter(student__id=student_id).order_by('-id')
     student = StudentRegister.objects.filter(id=student_id)  # 단일 객체를 가져오기
-    # research3 = student.values('research3_select')[0]['research3_select']
 
-    selected_week = request.GET.get('selected_week')
+    months = data.values('month').distinct()
 
-    if selected_week:
-        filtered_data = Student_Study_Data.objects.filter(week_name=selected_week, user__id=student_id)
-        total_study = filtered_data[0].korean_study + filtered_data[0].math_study + filtered_data[0].english_study + \
-                      filtered_data[0].research1_study + filtered_data[0].research2_study
-        total_self_study = filtered_data[0].korean_self_study + filtered_data[0].math_self_study + filtered_data[
-            0].english_self_study + filtered_data[0].research1_self_study + filtered_data[0].research2_self_study
+    select_month = request.GET.get('select_month')
+
+    if select_month:
+        filtered_data = WordTest.objects.filter(month=select_month, student_id=student_id)
     else:
         filtered_data = []
-        total_study = 0
-        total_self_study = 0
 
-    print(student)
     context = {
         'data': data,
         'student': student,
-        'research1': research1,
-        'research2': research2,
-        'selected_week': selected_week,
+        'months': months,
+        'select_month': select_month,
         'filtered_data': filtered_data,
-        'total_study': total_study,
-        'total_self_study': total_self_study
     }
-    return render(request, 'manager/student_study/student_study_detail.html', context)
+    return render(request, 'manager/word/word_detail.html', context)
 
 def word_create(request, student_id):
     student = StudentRegister.objects.get(id=student_id)
+    data = WordTest.objects.filter(student__id=student_id).order_by('-id')
     if request.method == 'POST':
         form = WordTestForm(request.POST)
         if form.is_valid():
-            word = form.save(commit=False)
-            word.save()
+            word_test = form.save(commit=False)
+            word_test.student = student
+            word_test.save()
             return redirect('manager:word_detail', student_id)
     else:
         form = WordTestForm()
-    context = {'form': form, 'student': student}
+    context = {'form': form, 'student': student, 'data': data}
     return render(request, 'manager/word/word_form.html', context)
 
 def word_modify(request, data_id):
-    word_test = get_object_or_404(WordTest, pk=data_id)
-    student = get_object_or_404(StudentRegister, id=word_test.user_id)
+    month_data = get_object_or_404(WordTest, pk=data_id)
+    data = WordTest.objects.filter(student=month_data.student).order_by('-id')
+
+    student = get_object_or_404(StudentRegister, id=month_data.student_id)
     student_id = student.id
 
     if request.method == "POST":
-        form = WordTestForm(request.POST, instance=word_test)
+        form = WordTestForm(request.POST, instance=month_data)
         if form.is_valid():
             word_test = form.save(commit=False)
+            word_test.student = StudentRegister.objects.get(id=student_id)
             word_test.save()
-            return redirect('manager:word_detail', stu_id=question.id)
+            return redirect('manager:word_detail', student_id=student_id)
     else:
-        form = WordTestForm(instance=word_test)
-    context = {'form': form}
-    return render(request, 'pybo/question_form.html', context)
+        form = WordTestForm(instance=month_data)
+    context = {'form': form, 'data': data, 'student': student, 'month_data': month_data}
+    return render(request, 'manager/word/word_form.html', context)
 def word_delete(request, data_id):
+    data = get_object_or_404(WordTest, id=data_id)
+    student_id = data.student_id
+    data.delete()
+    return redirect('manager:word_detail', student_id=student_id)
