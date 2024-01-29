@@ -25,6 +25,11 @@
 {#           aria-current="true">#}
 {#            상담 조회 페이지#}
 {#        </a>#}
+        <a href="{% url 'manager:report_consulting_main' %}"
+           class="list-group-item list-group-item-action text-center"
+           aria-current="true">
+            질문 내역 (학생 검색)
+        </a>
         <div class="card text-center mt-3 border border-success">
             <div class="card-header text-center bg-success-subtle">
                 <h5>레포트 입력</h5>
@@ -87,7 +92,6 @@
 {#        <ul class="dropdown-menu">#}
 {#            <li><a class="dropdown-item" href="#">성적 ex) 6평</a></li>#}
 {#            <li><a class="dropdown-item" href="{% url 'manager:report_study_main' %}">학과습 & 일일 순찰</a></li>#}
-            <li><a class="dropdown-item" href="{% url 'manager:report_consulting_main' %}">상담 & 질의</a></li>
 {#        </ul>#}
     </ul>
 </div>

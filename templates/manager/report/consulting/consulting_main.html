@@ -1,83 +1,624 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block content %}
+    <style>
+        @font-face {
+            font-family: 'PyeongChangPeace-Bold';
+            src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2206-02@1.0/PyeongChangPeace-Bold.woff2') format('woff2');
+            font-weight: 700;
+            font-style: normal;
+        }
+    </style>
     <div class="container-fluid">
         <div class="row">
-            <div class="col-md-2">
-                <ul class="list-group dropdown-center">
-                    <a href="{% url 'manager:reserve' %}"
-                       class="list-group-item list-group-item-action text-center"
-                       aria-current="true">
-                        질문예약
-                    </a>
-                    <a href="{% url 'manager:consulting' %}"
-                       class="list-group-item list-group-item-action text-center"
-                       aria-current="true">
-                        상담 조회 페이지
-                    </a>
-                    <a href="{% url 'manager:student_study' %}"
-                       class="list-group-item list-group-item-action text-center"
-                       aria-current="true">
-                        학생 학습 데이터
-                    </a>
-                    <a href="{% url 'manager:patrol' %}"
-                       class="list-group-item list-group-item-action text-center"
-                       aria-current="true">
-                        일일 순찰 데이터
-                    </a>
-                    <a href="{% url 'manager:data' %}"
-                       class="list-group-item list-group-item-action text-center"
-                       aria-current="true">
-                        데이터 가공
-                    </a>
-                    <button class="btn btn-success dropdown-toggle" type="button" data-bs-toggle="dropdown"
-                            aria-expanded="false">
-                        Report
-                    </button>
-                    <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="#">성적 ex) 6평</a></li>
-                        <li><a class="dropdown-item" href="{% url 'manager:report_study_main' %}">학습 & 일일 순찰</a></li>
-                        <li><a class="dropdown-item" href="{% url 'manager:report_consulting_main' %}">상담 & 질의</a></li>
-                    </ul>
-                </ul>
-                <div class="text-center list-group mt-3">
-                    <div class="card border-secondary mb-3">
-                        <form method="GET" action="{% url 'manager:report_consulting_detail' %}">
-                            <div class="card-body">
-                                <div class="input-group">
-                                    {% csrf_token %}
-                                    <select class="form-control" id="id_student_name" name="student_name">
-                                        <option value="">학생 검색</option>
-                                        {% for names in student_names %}
-                                            <option value="{{ names.student_name__first_name }}">{{ names.student_name__first_name }}</option>
-                                        {% endfor %}
-                                    </select>
+            {% include 'manager/manager_main_menu.html' %}
+            <div class="col-md-10">
+                <div class="container">
+                    <form method="GET" action="#">
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <div class="card border-secondary mb-3" style="height: 10rem">
+                                    <div class="card-header bg-danger-subtle">학생 이름</div>
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <label for="id_student_name" class="form-label">학생 이름</label>
+                                                <select class="form-control" id="id_student_name" name="student_name">
+                                                    <option value="">영단어 레포트 선택</option>
+                                                    {% for month in months %}
+                                                        <option value="{{ month.month }}">{{ month.month }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="card-header bg-primary-subtle">기간 설정</div>
-                            <div class="card-body">
-                                <div class="input-group mb-4">
-                                    <select class="form-control" id="id_start_date" name="start_date">
-                                        <option value="">시작일</option>
-                                        {% for date in date %}
-                                            <option value="{{ date.date }}">{{ date.date }}</option>
-                                        {% endfor %}
-                                    </select>
+                            <div class="col-md-6">
+                                <div class="card border-secondary mb-3" style="height: 10rem">
+                                    <div class="card-header bg-info-subtle">질의응답</div>
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-md-5">
+                                                <label for="id_start_date" class="form-label">시작일</label>
+                                                <input type="date" class="form-control" id="id_start_date" name="start_date"
+                                                       value="{{ form.start_date.value|default_if_none:'' }}">
+                                            </div>
+                                            <div class="col-md-5">
+                                                <label for="id_end_date" class="form-label">마지막일</label>
+                                                <input type="date" class="form-control" id="id_end_date" name="end_date"
+                                                       value="{{ form.end_date.value|default_if_none:'' }}">
+                                            </div>
+                                            <div class="col-md-2">
+                                                <button class="btn btn-outline-success" type="submit" id="button"
+                                                        style="vertical-align: center">검색
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="input-group mb-4">
-                                    <select class="form-control" id="id_end_date" name="end_date">
-                                        <option value="">마지막일</option>
-                                        {% for date in date %}
-                                            <option value="{{ date.date }}">{{ date.date }}</option>
-                                        {% endfor %}
-                                    </select>
-                                </div>
-                                <button class="btn btn-outline-success" type="submit" id="button-addon2">검색
-                                </button>
                             </div>
-                        </form>
+                        </div>
+                    </form>
+                </div>
+            {% for data in word_data %}
+                <div class="container-fluid mb-3" id="report_div" style="width:1160px; height:720px">
+                    <div class="container-fluid mb-3" style="width:1180px; height:55px">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <img class="mt-2" style="max-height: 55px" src="{% static 'nav_logo.jpeg' %}"
+                                     alt="logo"/>
+                            </div>
+                            <div class="col-md-8 mt-3">
+                                <h3 style="font-family: 'PyeongChangPeace-Bold', sans-serif;">
+                                    <span style="font-size:32px; ">The Premium 과수원</span>
+                                    <span style="font-size:32px; ">윈터클래스</span>
+                                    <span style="font-size:32px; ">주간 테스트</span>
+                                </h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col-md-2 mb-2">
+                            <div style="height:515px">
+                                <div class="card">
+                                    <div class="card-header bg-success-subtle"
+                                         style="display: flex; align-items: center;">
+                                        <p class="card-title" style="margin: 0; font-size:44px;">
+                                            <strong>{{ student.student }}</strong></p>
+                                    </div>
+                                </div>
+{#                                <div class="card mt-3">#}
+{#                                    <div class="card-header bg-primary-subtle"#}
+{#                                         style="display: flex; align-items: center;">#}
+{#                                        <p class="card-title" style="margin: 0; font-size:20px">#}
+{#                                            <strong>총 질문 및 상담</strong></p>#}
+{#                                    </div>#}
+{#                                    <div class="card-body"#}
+{#                                         style="display: flex; align-items: center; text-align: center">#}
+{#                                        {{ report.total_question_data }}회#}
+{#                                    </div>#}
+{#                                </div>#}
+                                <div class="card mt-2" style="height: 11rem">
+                                    <div class="card-header bg-primary-subtle"
+                                         style="display: flex; align-items: center;">
+                                        <p class="card-title" style="margin: 0; font-size:16px">
+                                            <strong>수학 주간 테스트</strong></p>
+                                    </div>
+                                    <div class="card-body mt-2">
+                                        <p>
+                                            <span style="font-size:16px">1차 시험</span>
+                                            <span style="font-size:12px">-</span>
+                                            <span style="font-size:18px"><strong>{{ data.weekly_math_test1|default_if_none:'' }}</strong></span>
+                                            <span class="text-secondary" style="font-size:12px;">/ 100</span>
+                                        </p>
+                                        <p class="mt-1">
+                                            <span style="font-size:16px">2차 시험 </span>
+                                            <span style="font-size:12px">-</span>
+                                            <span style="font-size:18px"><strong> {{ data.weekly_math_test2|default_if_none:'' }}</strong></span>
+                                            <span class="text-secondary" style="font-size:12px;">/ 100</span>
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="card mt-2" style="height: 11rem">
+                                    <div class="card-header bg-warning-subtle"
+                                         style="display: flex; align-items: center;">
+                                        <p class="card-title" style="margin: 0; font-size:16px">
+                                            <strong>국어 주간 테스트</strong></p>
+                                    </div>
+                                    <div class="card-body mt-2">
+                                        <p>
+                                            <span style="font-size:16px">1차 시험</span>
+                                            <span style="font-size:12px">-</span>
+                                            <span style="font-size:18px"><strong>{{ data.weekly_korean_test1|default_if_none:'' }}</strong></span>
+                                            <span class="text-secondary" style="font-size:12px;">/ 100</span>
+                                        </p>
+                                        <p class="mt-1">
+                                            <span style="font-size:16px">2차 시험</span>
+                                            <span style="font-size:12px">-</span>
+                                            <span style="font-size:18px"><strong> {{ data.weekly_korean_test2|default_if_none:'' }}</strong></span>
+                                            <span class="text-secondary" style="font-size:12px;">/ 100</span>
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="card mt-2" style="height: 11rem">
+                                    <div class="card-header bg-info-subtle"
+                                         style="display: flex; align-items: center">
+                                        <p class="card-title" style="margin: 0; font-size:15px">
+                                            <strong>영단어 랜덤 테스트</strong></p>
+                                    </div>
+                                    <div class="card-body mt-2">
+                                        <p>
+                                            <span style="font-size:16px">1차 시험</span>
+                                            <span style="font-size:12px">-</span>
+                                            <span style="font-size:18px"><strong>{{ data.random_word1|default_if_none:'' }}</strong></span>
+                                            <span class="text-secondary" style="font-size:12px;">/ 100</span>
+                                        </p>
+                                        <p class="mt-1">
+                                            <span style="font-size:16px">2차 시험 </span>
+                                            <span style="font-size:12px">-</span>
+                                            <span style="font-size:18px"><strong> {{ data.random_word2|default_if_none:'' }}</strong></span>
+                                            <span class="text-secondary" style="font-size:12px;">/ 100</span>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+{#                                <img style="max-height: 156px; margin-left:-20px" src="{% static '3.jpg' %}"#}
+{#                                     alt="logo"/>#}
+                                <img src="{% static 'save_btn.png' %}"
+                                     class="save-btn"
+                                     data-target="report_div"
+                                     data-student-name="{{ student.student }}"
+                                     data-month-name="{{ data.month }}"
+                                     alt="이미지 저장" style="cursor:pointer; height:30px; width:30px; opacity:0.5; margin-top: 100px"/>
+                            </div>
+                        </div>
+                        <div class="col-md-10">
+                            <div class="container" style="height:624px">
+                                <div class="card border border-secondary" style="width: 58rem;">
+                                  <div class="card-header bg-success-subtle" style="height:40px;">
+                                    <h5 class="card-title"><strong>1주차 영단어</strong></h5>
+                                  </div>
+                                  <div class="card-body">
+                                      <div class="row">
+                                          <div class="col-md-2">
+                                              <div class="card text-center">
+                                                  <div class="card-header" style="height:40px; background-color: #EBFFEB;">
+                                                    <h6 class="card-title" style="font-size:20px">Day 1</h6>
+                                                  </div>
+                                                  <div class="card-title" style="height:30px;">
+                                                      {% if data.day1 %}
+                                                          <p>
+                                                              <span style="font-size:24px;">{{ data.day1|default_if_none:'' }}</span>
+                                                              <span class="text-secondary" style="font-size:14px;">/ 40</span>
+                                                          </p>
+                                                      {% endif %}
+                                                  </div>
+                                              </div>
+                                          </div>
+                                          <div class="col-md-2">
+                                              <div class="card text-center">
+                                                  <div class="card-header" style="height:40px; background-color: #EBFFEB;">
+                                                    <h6 class="card-title" style="font-size:20px">Day 2</h6>
+                                                  </div>
+                                                  <div class="card-title" style="height:30px; font-size:24px">
+                                                      {% if data.day2 %}
+                                                          <p>
+                                                              <span style="font-size:24px;">{{ data.day2|default_if_none:'' }}</span>
+                                                              <span class="text-secondary" style="font-size:14px;">/ 40</span>
+                                                          </p>
+                                                      {% endif %}
+                                                  </div>
+                                              </div>
+                                          </div>
+                                          <div class="col-md-2">
+                                              <div class="card text-center">
+                                                  <div class="card-header" style="height:40px; background-color: #EBFFEB;">
+                                                    <h6 class="card-title" style="font-size:20px">Day 3</h6>
+                                                  </div>
+                                                  <div class="card-title" style="height:30px; font-size:24px">
+                                                      {% if data.day3 %}
+                                                          <p>
+                                                              <span style="font-size:24px;">{{ data.day3|default_if_none:'' }}</span>
+                                                              <span class="text-secondary" style="font-size:14px;">/ 40</span>
+                                                          </p>
+                                                      {% endif %}
+                                                  </div>
+                                              </div>
+                                          </div>
+                                          <div class="col-md-2">
+                                              <div class="card text-center">
+                                                  <div class="card-header" style="height:40px; background-color: #EBFFEB;">
+                                                    <h6 class="card-title" style="font-size:20px">Day 4</h6>
+                                                  </div>
+                                                  <div class="card-title" style="height:30px; font-size:24px">
+                                                      {% if data.day4 %}
+                                                          <p>
+                                                              <span style="font-size:24px;">{{ data.day4|default_if_none:'' }}</span>
+                                                              <span class="text-secondary" style="font-size:14px;">/ 40</span>
+                                                          </p>
+                                                      {% endif %}
+                                                  </div>
+                                              </div>
+                                          </div>
+                                          <div class="col-md-2">
+                                              <div class="card text-center">
+                                                  <div class="card-header" style="height:40px; background-color: #EBFFEB;">
+                                                    <h6 class="card-title" style="font-size:20px">Day 5</h6>
+                                                  </div>
+                                                  <div class="card-title" style="height:30px; font-size:24px">
+                                                      {% if data.day5 %}
+                                                          <p>
+                                                              <span style="font-size:24px;">{{ data.day5|default_if_none:'' }}</span>
+                                                              <span class="text-secondary" style="font-size:14px;">/ 40</span>
+                                                          </p>
+                                                      {% endif %}
+                                                  </div>
+                                              </div>
+                                          </div>
+                                          <div class="col-md-2">
+                                              <div class="card text-center">
+                                                  <div class="card-header" style="height:40px; background-color: #EBFFEB;">
+                                                    <h6 class="card-title" style="font-size:20px">Day 6</h6>
+                                                  </div>
+                                                  <div class="card-title" style="height:30px; font-size:24px">
+                                                      {% if data.day6 %}
+                                                          <p>
+                                                              <span style="font-size:24px;">{{ data.day6|default_if_none:'' }}</span>
+                                                              <span class="text-secondary" style="font-size:14px;">/ 40</span>
+                                                          </p>
+                                                      {% endif %}
+                                                  </div>
+                                              </div>
+                                          </div>
+                                      </div>
+                                  </div>
+                            </div>
+{#                                2주차 #}
+                                <div class="card border border-secondary mt-2" style="width: 58rem;">
+                                  <div class="card-header bg-primary-subtle" style="height:40px;">
+                                    <h5 class="card-title"><strong>2주차 영단어</strong></h5>
+                                  </div>
+                                  <div class="card-body">
+                                      <div class="row">
+                                          <div class="col-md-2">
+                                              <div class="card text-center">
+                                                  <div class="card-header" style="height:40px; background-color: #C3E7FA">
+                                                    <h6 class="card-title" style="font-size:20px">Day 7</h6>
+                                                  </div>
+                                                  <div class="card-title" style="height:30px; font-size:24px">
+                                                      {% if data.day7 %}
+                                                          <p>
+                                                              <span style="font-size:24px;">{{ data.day7|default_if_none:'' }}</span>
+                                                              <span class="text-secondary" style="font-size:14px;">/ 40</span>
+                                                          </p>
+                                                      {% endif %}
+                                                  </div>
+                                              </div>
+                                          </div>
+                                          <div class="col-md-2">
+                                              <div class="card text-center">
+                                                  <div class="card-header" style="height:40px; background-color: #C3E7FA">
+                                                    <h6 class="card-title" style="font-size:20px">Day 8</h6>
+                                                  </div>
+                                                  <div class="card-title" style="height:30px; font-size:24px">
+                                                      {% if data.day8 %}
+                                                          <p>
+                                                              <span style="font-size:24px;">{{ data.day8|default_if_none:'' }}</span>
+                                                              <span class="text-secondary" style="font-size:14px;">/ 40</span>
+                                                          </p>
+                                                      {% endif %}
+                                                  </div>
+                                              </div>
+                                          </div>
+                                          <div class="col-md-2">
+                                              <div class="card text-center">
+                                                  <div class="card-header" style="height:40px; background-color: #C3E7FA">
+                                                    <h6 class="card-title" style="font-size:20px">Day 9</h6>
+                                                  </div>
+                                                  <div class="card-title" style="height:30px; font-size:24px">
+                                                      {% if data.day9 %}
+                                                          <p>
+                                                              <span style="font-size:24px;">{{ data.day9|default_if_none:'' }}</span>
+                                                              <span class="text-secondary" style="font-size:14px;">/ 40</span>
+                                                          </p>
+                                                      {% endif %}
+                                                  </div>
+                                              </div>
+                                          </div>
+                                          <div class="col-md-2">
+                                              <div class="card text-center">
+                                                  <div class="card-header" style="height:40px; background-color: #C3E7FA">
+                                                    <h6 class="card-title" style="font-size:20px">Day 10</h6>
+                                                  </div>
+                                                  <div class="card-title" style="height:30px; font-size:24px">
+                                                      {% if data.day10 %}
+                                                          <p>
+                                                              <span style="font-size:24px;">{{ data.day10|default_if_none:'' }}</span>
+                                                              <span class="text-secondary" style="font-size:14px;">/ 40</span>
+                                                          </p>
+                                                      {% endif %}
+                                                  </div>
+                                              </div>
+                                          </div>
+                                          <div class="col-md-2">
+                                              <div class="card text-center">
+                                                  <div class="card-header" style="height:40px; background-color: #C3E7FA">
+                                                    <h6 class="card-title" style="font-size:20px">Day 11</h6>
+                                                  </div>
+                                                  <div class="card-title" style="height:30px; font-size:24px">
+                                                      {% if data.day11 %}
+                                                          <p>
+                                                              <span style="font-size:24px;">{{ data.day11|default_if_none:'' }}</span>
+                                                              <span class="text-secondary" style="font-size:14px;">/ 40</span>
+                                                          </p>
+                                                      {% endif %}
+                                                  </div>
+                                              </div>
+                                          </div>
+                                          <div class="col-md-2">
+                                              <div class="card text-center">
+                                                  <div class="card-header" style="height:40px; background-color: #C3E7FA">
+                                                    <h6 class="card-title" style="font-size:20px">Day 12</h6>
+                                                  </div>
+                                                  <div class="card-title" style="height:30px; font-size:24px">
+                                                      {% if data.day12 %}
+                                                          <p>
+                                                              <span style="font-size:24px;">{{ data.day12|default_if_none:'' }}</span>
+                                                              <span class="text-secondary" style="font-size:14px;">/ 40</span>
+                                                          </p>
+                                                      {% endif %}
+                                                  </div>
+                                              </div>
+                                          </div>
+                                      </div>
+                                  </div>
+                            </div>
+{#                                3주차 #}
+                                <div class="card border border-secondary mt-2" style="width: 58rem;">
+                                  <div class="card-header bg-success-subtle" style="height:40px">
+                                    <h5 class="card-title"><strong>3주차 영단어</strong></h5>
+                                  </div>
+                                  <div class="card-body">
+                                      <div class="row">
+                                          <div class="col-md-2">
+                                              <div class="card text-center">
+                                                  <div class="card-header" style="height:40px; background-color: #EBFFEB;">
+                                                    <h6 class="card-title" style="font-size:20px">Day 13</h6>
+                                                  </div>
+                                                  <div class="card-title" style="height:30px; font-size:24px">
+                                                      {% if data.day13 %}
+                                                          <p>
+                                                              <span style="font-size:24px;">{{ data.day13|default_if_none:'' }}</span>
+                                                              <span class="text-secondary" style="font-size:14px;">/ 40</span>
+                                                          </p>
+                                                      {% endif %}
+                                                  </div>
+                                              </div>
+                                          </div>
+                                          <div class="col-md-2">
+                                              <div class="card text-center">
+                                                  <div class="card-header" style="height:40px; background-color: #EBFFEB;">
+                                                    <h6 class="card-title" style="font-size:20px">Day 14</h6>
+                                                  </div>
+                                                  <div class="card-title" style="height:30px; font-size:24px">
+                                                      {% if data.day14 %}
+                                                          <p>
+                                                              <span style="font-size:24px;">{{ data.day14|default_if_none:'' }}</span>
+                                                              <span class="text-secondary" style="font-size:14px;">/ 40</span>
+                                                          </p>
+                                                      {% endif %}
+                                                  </div>
+                                              </div>
+                                          </div>
+                                          <div class="col-md-2">
+                                              <div class="card text-center">
+                                                  <div class="card-header" style="height:40px; background-color: #EBFFEB;">
+                                                    <h6 class="card-title" style="font-size:20px">Day 15</h6>
+                                                  </div>
+                                                  <div class="card-title" style="height:30px; font-size:24px">
+                                                      {% if data.day15 %}
+                                                          <p>
+                                                              <span style="font-size:24px;">{{ data.day15|default_if_none:'' }}</span>
+                                                              <span class="text-secondary" style="font-size:14px;">/ 40</span>
+                                                          </p>
+                                                      {% endif %}
+                                                  </div>
+                                              </div>
+                                          </div>
+                                          <div class="col-md-2">
+                                              <div class="card text-center">
+                                                  <div class="card-header" style="height:40px; background-color: #EBFFEB;">
+                                                    <h6 class="card-title" style="font-size:20px">Day 16</h6>
+                                                  </div>
+                                                  <div class="card-title" style="height:30px; font-size:24px">
+                                                      {% if data.day16 %}
+                                                          <p>
+                                                              <span style="font-size:24px;">{{ data.day16|default_if_none:'' }}</span>
+                                                              <span class="text-secondary" style="font-size:14px;">/ 40</span>
+                                                          </p>
+                                                      {% endif %}
+                                                  </div>
+                                              </div>
+                                          </div>
+                                          <div class="col-md-2">
+                                              <div class="card text-center">
+                                                  <div class="card-header" style="height:40px; background-color: #EBFFEB;">
+                                                    <h6 class="card-title" style="font-size:20px">Day 17</h6>
+                                                  </div>
+                                                  <div class="card-title" style="height:30px; font-size:24px">
+                                                      {% if data.day17 %}
+                                                          <p>
+                                                              <span style="font-size:24px;">{{ data.day17|default_if_none:'' }}</span>
+                                                              <span class="text-secondary" style="font-size:14px;">/ 40</span>
+                                                          </p>
+                                                      {% endif %}
+                                                  </div>
+                                              </div>
+                                          </div>
+                                          <div class="col-md-2">
+                                              <div class="card text-center">
+                                                  <div class="card-header" style="height:40px; background-color: #EBFFEB;">
+                                                    <h6 class="card-title" style="font-size:20px">Day 18</h6>
+                                                  </div>
+                                                  <div class="card-title" style="height:30px; font-size:24px">
+                                                      {% if data.day18 %}
+                                                          <p>
+                                                              <span style="font-size:24px;">{{ data.day18|default_if_none:'' }}</span>
+                                                              <span class="text-secondary" style="font-size:14px;">/ 40</span>
+                                                          </p>
+                                                      {% endif %}
+                                                  </div>
+                                              </div>
+                                          </div>
+                                      </div>
+                                  </div>
+                            </div>
+{#                                4 주차#}
+                                <div class="card border border-secondary mt-2" style="width: 58rem;">
+                                  <div class="card-header bg-primary-subtle" style="height:40px">
+                                    <h5 class="card-title"><strong>4주차 영단어</strong></h5>
+                                  </div>
+                                  <div class="card-body">
+                                      <div class="row">
+                                          <div class="col-md-2">
+                                              <div class="card text-center">
+                                                  <div class="card-header" style="height:40px; background-color: #C3E7FA">
+                                                    <h6 class="card-title" style="font-size:20px">Day 19</h6>
+                                                  </div>
+                                                  <div class="card-title" style="height:30px; font-size:24px">
+                                                      {% if data.day19 %}
+                                                          <p>
+                                                              <span style="font-size:24px;">{{ data.day19|default_if_none:'' }}</span>
+                                                              <span class="text-secondary" style="font-size:14px;">/ 40</span>
+                                                          </p>
+                                                      {% endif %}
+                                                  </div>
+                                              </div>
+                                          </div>
+                                          <div class="col-md-2">
+                                              <div class="card text-center">
+                                                  <div class="card-header" style="height:40px; background-color: #C3E7FA">
+                                                    <h6 class="card-title" style="font-size:20px">Day 20</h6>
+                                                  </div>
+                                                  <div class="card-title" style="height:30px; font-size:24px">
+                                                      {% if data.day20 %}
+                                                          <p>
+                                                              <span style="font-size:24px;">{{ data.day20|default_if_none:'' }}</span>
+                                                              <span class="text-secondary" style="font-size:14px;">/ 40</span>
+                                                          </p>
+                                                      {% endif %}
+                                                  </div>
+                                              </div>
+                                          </div>
+                                          <div class="col-md-2">
+                                              <div class="card text-center">
+                                                  <div class="card-header" style="height:40px; background-color: #C3E7FA">
+                                                    <h6 class="card-title" style="font-size:20px">Day 21</h6>
+                                                  </div>
+                                                  <div class="card-title" style="height:30px; font-size:24px">
+                                                      {% if data.day21 %}
+                                                          <p>
+                                                              <span style="font-size:24px;">{{ data.day21|default_if_none:'' }}</span>
+                                                              <span class="text-secondary" style="font-size:14px;">/ 40</span>
+                                                          </p>
+                                                      {% endif %}
+                                                  </div>
+                                              </div>
+                                          </div>
+                                          <div class="col-md-2">
+                                              <div class="card text-center">
+                                                  <div class="card-header" style="height:40px; background-color: #C3E7FA">
+                                                    <h6 class="card-title" style="font-size:20px">Day 22</h6>
+                                                  </div>
+                                                  <div class="card-title" style="height:30px; font-size:24px">
+                                                      {% if data.day22 %}
+                                                          <p>
+                                                              <span style="font-size:24px;">{{ data.day22|default_if_none:'' }}</span>
+                                                              <span class="text-secondary" style="font-size:14px;">/ 40</span>
+                                                          </p>
+                                                      {% endif %}
+                                                  </div>
+                                              </div>
+                                          </div>
+                                          <div class="col-md-2">
+                                              <div class="card text-center">
+                                                  <div class="card-header" style="height:40px; background-color: #C3E7FA">
+                                                    <h6 class="card-title" style="font-size:20px">Day 23</h6>
+                                                  </div>
+                                                  <div class="card-title" style="height:30px; font-size:24px">
+                                                      {% if data.day23 %}
+                                                          <p>
+                                                              <span style="font-size:24px;">{{ data.day23|default_if_none:'' }}</span>
+                                                              <span class="text-secondary" style="font-size:14px;">/ 40</span>
+                                                          </p>
+                                                      {% endif %}
+                                                  </div>
+                                              </div>
+                                          </div>
+                                          <div class="col-md-2">
+                                              <div class="card text-center">
+                                                  <div class="card-header" style="height:40px; background-color: #C3E7FA">
+                                                    <h6 class="card-title" style="font-size:20px">Day 24</h6>
+                                                  </div>
+                                                  <div class="card-title" style="height:30px; font-size:24px">
+                                                      {% if data.day24 %}
+                                                          <p>
+                                                              <span style="font-size:24px;">{{ data.day24|default_if_none:'' }}</span>
+                                                              <span class="text-secondary" style="font-size:14px;">/ 40</span>
+                                                          </p>
+                                                      {% endif %}
+                                                  </div>
+                                              </div>
+                                          </div>
+                                      </div>
+                                  </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
+                </div>
+            {% endfor %}
             </div>
         </div>
     </div>
+
+{#    이미지 저장 버튼 코드 #}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+
+    <script type="text/javascript">
+    $(document).ready(function(){
+        $(".save-btn").on("click", function(){
+            var targetId = $(this).data('target');
+            var studentName = $(this).data('student-name');
+            var monthName = $(this).data('month-name');
+            var button = $(this); // 현재 버튼을 변수에 저장
+            button.hide(); // 버튼을 숨깁니다
+
+            html2canvas($('#' + targetId)[0]).then(function(canvas){
+                var img = document.createElement("a");
+                img.download = studentName + '_' + monthName + '영단어_report.png'; // 파일 이름 설정
+                img.href = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
+                document.body.appendChild(img);
+                img.click();
+                document.body.removeChild(img); // 생성된 링크를 제거합니다
+                button.show(); // 이미지 캡쳐 후 버튼을 다시 보여줍니다
+            });
+        });
+    });
+    </script>
+    <script>
+    document.getElementById("button").addEventListener("click", function(event){
+        var word_month = document.getElementById("id_word_month").value;
+        var start_date = document.getElementById("id_start_date").value;
+        var end_date = document.getElementById("id_end_date").value;
+
+        if (!word_month || !start_date || !end_date) {
+            alert("모든 필드를 채워주세요.");
+            event.preventDefault();
+        }
+    });
+    </script>
 {% endblock %}
